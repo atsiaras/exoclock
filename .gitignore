@@ -1,0 +1,7 @@
+*.pyc
+*.egg-info
+*.eggs
+*.pytest_cache
+*.idea
+*.coverage*
+exoclock/*_local_*
