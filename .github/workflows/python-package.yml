@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.8, 3.9, 3.10, 3.11]
+        python-version: ['3.8', '3.9', '3.10', '3.11']
 
     steps:
       - name: Checkout
@@ -30,7 +30,7 @@ jobs:
           python -m pip install pytest pytest-cov
           pip install -e .
       - name: Run tests
-        run: pytest --cov=exoclock term-missing --cov-report=xml
+        run: pytest -s --cov=exoclock term-missing --cov-report=xml
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v4
         with:
