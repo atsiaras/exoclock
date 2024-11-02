@@ -1,0 +1,12 @@
+include exoclock/catalogues/*
+include exoclock/processes/*
+include exoclock/spacetime/*
+include exoclock/__author__.txt
+include exoclock/__author_email__.txt
+include exoclock/__databases__.pickle
+include exoclock/__description__.txt
+include exoclock/__url__.txt
+include exoclock/__version__.txt
+include README.md 
+include LICENSE
+include requirements.txt
