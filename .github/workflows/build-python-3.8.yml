@@ -5,9 +5,7 @@ name: Build Python 3.8
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [ main, dev ]
 
 jobs:
   build:
