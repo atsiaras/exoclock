@@ -1,7 +1,6 @@
 
 import pytest
 import exoclock
-from exoclock.catalogues.simbad import _fix_simbad_coordinates
 
 
 def test_ecc():
@@ -60,12 +59,11 @@ def test_simbad():
 
     assert target.name == 'BD+28 2507'
 
-    target = exoclock.simbad_search_by_coordinates(target.ra, target.dec, reconnect=True)
+    target = exoclock.simbad_search_by_coordinates(target.ra, target.dec, radius=exoclock.Degrees(0.5), reconnect=True)
 
     assert target.name == 'BD+28 2507b'
 
-    assert _fix_simbad_coordinates('16') == '16:00:00'
-    assert _fix_simbad_coordinates('16:00') == '16:00:00'
-
     assert exoclock.simbad_search_by_name('BDXXXXXXXXXXXXXXXXX') is None
-    assert exoclock.simbad_search_by_coordinates(exoclock.Hours(1), exoclock.Degrees(0), radius=exoclock.Degrees(0.001)) is None
+    assert exoclock.simbad_search_by_coordinates(
+        exoclock.Hours(1), exoclock.Degrees(0), radius=exoclock.Degrees(0.001)
+    ) is None

@@ -4,8 +4,10 @@ import time
 import urllib
 import requests
 import warnings
+import astropy.units as units
+import astroquery.simbad
 
-from astroquery.simbad import Simbad
+from astropy.coordinates import SkyCoord
 
 from ..spacetime.angles import *
 from ..spacetime.moments import now
@@ -14,11 +16,12 @@ from ..spacetime.targets import *
 from ..databases import exoclock_data
 from ..errors import *
 
-Simbad = Simbad()
-Simbad.add_votable_fields('ids')
+
+astroquery.simbad.conf.servers_list.append('simbad.idia.ac.za')
+
+Simbad = astroquery.simbad.Simbad()
 
 Simbad.SIMBAD_URL = None
-Simbad.TIMEOUT = 5
 
 # check simbad url
 def check_simbad_server(force_fail=False):
@@ -27,20 +30,23 @@ def check_simbad_server(force_fail=False):
 
         print('exoclock: Checking Simbad server...')
 
-        for url in [
-            'https://simbad.cds.unistra.fr/simbad',
-            'https://simbad.idia.ac.za/simbad',
-            'https://simbad.cfa.harvard.edu/simbad'
+        for server in [
+            'simbad.cds.unistra.fr',
+            'simbad.idia.ac.za',
+            'simbad.cfa.harvard.edu'
         ]:
+            url = 'https://' + server + '/simbad'
             try:
                 if force_fail:
                     print(error)
                 _ = urllib.request.urlopen(url, timeout=5)
+                Simbad.server = server
                 Simbad.SIMBAD_URL = url + '/sim-script'
-                print('connected to: ', url)
+                Simbad.timeout = 5
+                print('connected to: ', server)
                 return True
             except:
-                print('failed to connect to: ', url)
+                print('failed to connect to: ', server)
                 pass
 
         if not Simbad.SIMBAD_URL:
@@ -61,7 +67,7 @@ def get_simbad_status():
         message = 'Disconnected'
 
     else:
-        message = 'Connected to ' + Simbad.SIMBAD_URL
+        message = 'Connected to ' + Simbad.server
 
     message += '\n({0} UTC)'.format(now().utc().isoformat())
 
@@ -108,19 +114,6 @@ def _fix_simbad_name(input):
 
     return input
 
-
-def _fix_simbad_coordinates(input):
-
-    input = str(input).replace(' ', ':')
-
-    if len(input.split(':')) == 1:
-        input += ':00:00'
-    elif len(input.split(':')) == 2:
-        input += ':00'
-
-    return input
-
-
 def simbad_search_by_name(star_name, reconnect=False):
 
     try:
@@ -161,21 +154,22 @@ def simbad_search_by_name(star_name, reconnect=False):
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore")
                 result = Simbad.query_object(star_name)
+
+            if result and len(result) > 0:
+
+                return FixedTarget(
+                    Degrees(result[0]['ra']), Degrees(result[0]['dec']),
+                    _fix_simbad_name(result[0]['main_id']),
+                    list(Simbad.query_objectids(result[0]['main_id'])['id'])
+                )
+
+            else:
+                print(star_name + ': No matches found.')
+                return None
+
         except requests.ConnectionError:
             print('Simbad disconnected.')
             Simbad.SIMBAD_URL = 'unavailable'
-
-        if result and len(result) > 0:
-
-            return FixedTarget(
-                Hours(_fix_simbad_coordinates(result[0]['RA'])),
-                Degrees(_fix_simbad_coordinates(result[0]['DEC'])),
-                _fix_simbad_name(result[0]['MAIN_ID']),
-                [_fix_simbad_name(ff) for ff in result[0]['IDS'].split('|')]
-            )
-
-        else:
-            print(star_name + ': No matches found.')
             return None
 
     else:
@@ -200,21 +194,35 @@ def simbad_search_by_coordinates(ra, dec, radius=Degrees(0.02), reconnect=False)
         try:
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore")
-                result = Simbad.query_region("{0}d {1}d".format(target.ra.deg(), target.dec.deg()),
-                                             radius='{0}d'.format(radius.deg()))
+                result = Simbad.query_region(
+                    SkyCoord(
+                        target.ra.deg(), target.dec.deg(), unit=(units.deg, units.deg), frame='icrs'),
+                    radius=radius.deg() * units.deg
+                )
+
+            if result and len(result) > 0:
+
+                list_to_sort = [[
+                    target.distance_on_sphere(
+                        FixedTarget(Degrees(result[row]['ra']), Degrees(result[row]['dec']))
+                    ).deg(), row ] for row in range(len(result)) ]
+
+                list_to_sort.sort()
+
+                row = list_to_sort[0][1]
+
+                return FixedTarget(
+                    Degrees(result[row]['ra']), Degrees(result[row]['dec']),
+                    _fix_simbad_name(result[row]['main_id']),
+                    list(Simbad.query_objectids(result[row]['main_id'])['id'])
+                )
+            else:
+                print('No matches found.')
+                return None
+
         except requests.ConnectionError:
             print('Simbad disconnected.')
             Simbad.SIMBAD_URL = 'unavailable'
-
-        if result and len(result) > 0:
-            return FixedTarget(
-                Hours(_fix_simbad_coordinates(result[0]['RA'])),
-                Degrees(_fix_simbad_coordinates(result[0]['DEC'])),
-                _fix_simbad_name(result[0]['MAIN_ID']),
-                [_fix_simbad_name(ff) for ff in result[0]['IDS'].split('|')]
-            )
-        else:
-            print('No matches found.')
             return None
 
     else:

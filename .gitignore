@@ -4,4 +4,5 @@
 *.pytest_cache
 *.idea
 *.coverage*
+*.DS_Store
 exoclock/*_local_*
