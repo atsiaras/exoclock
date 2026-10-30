@@ -26,7 +26,7 @@ class _Target:
 
     @lru_cache()
     def _get_class(self):
-        return 'plc.{0}'.format(str(self.__class__).split('.')[-1][:-2])
+        return 'exoclock.{0}'.format(str(self.__class__).split('.')[-1][:-2])
 
     def reset(self, epoch):
         pass
@@ -83,7 +83,7 @@ class Sun(_Target):
             _Target.__init__(self, Rad(ssb_ra), Rad(ssb_dec), epoch=epoch)
 
     def __repr__(self):
-        return 'plc.Sun(RA(hms)/DEC(dms): {0} at {1} UTC)'.format(self.coord(), self.epoch.utc())
+        return 'exoclock.Sun(RA(hms)/DEC(dms): {0} at {1} UTC)'.format(self.coord(), self.epoch.utc())
 
 
 class Moon(_Target):
@@ -122,7 +122,7 @@ class Moon(_Target):
             return 0.5 * (1.0 + f.cos())
 
     def __repr__(self):
-        return 'plc.Moon(RA(hms)/DEC(dms): {0} at {1} UTC)'.format(self.coord(), self.epoch.utc())
+        return 'exoclock.Moon(RA(hms)/DEC(dms): {0} at {1} UTC)'.format(self.coord(), self.epoch.utc())
 
 
 def _is_target(item):
@@ -133,4 +133,4 @@ def _request_target(item):
     if _is_target(item):
         pass
     else:
-        raise ExoClockInputError('A plc.Target object is required')
+        raise ExoClockInputError('A exoclock.Target object is required')

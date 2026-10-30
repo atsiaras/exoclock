@@ -144,6 +144,37 @@ class Observatory:
         horizon_altitude = self.horizon(azimuth)
         return altitude.deg_coord() > horizon_altitude.deg_coord()
 
+
+    def target_meridian_crossings(self, target, time_obj_1, time_obj_2, resolution=0.005):
+
+        _request_time(time_obj_1)
+        _request_time(time_obj_2)
+        _request_target(target)
+
+        crossings = []
+
+        jd1 = time_obj_1.jd_utc()
+        jd2 = time_obj_2.jd_utc()
+
+        test_ha = Degrees(self.lera(time_obj_1).deg() - target.ra.deg())
+
+        for jd in np.arange(jd1 + resolution, jd2 + resolution/10, resolution):
+
+            new_test_ha = Degrees(self.lera(Moment(jd_utc=jd)).deg() - target.ra.deg())
+
+            if test_ha.hours() > new_test_ha.hours():
+
+                crossings.append(
+                    Moment(jd_utc=jd - resolution/2)
+                )
+
+            else:
+                pass
+
+            test_ha = new_test_ha
+
+        return crossings
+
     def target_horizon_crossings(self, target, time_obj_1, window):
 
         _request_time(time_obj_1)
@@ -299,7 +330,7 @@ class Observatory:
         return events
 
     def __repr__(self):
-        return 'plc.Observatory(latitude(dms)/longitude(dms): {0}, time zone: {1} hours)'.format(
+        return 'exoclock.Observatory(latitude(dms)/longitude(dms): {0}, time zone: {1} hours)'.format(
             self.coord(), self.time_zone)
 
 
@@ -311,4 +342,4 @@ def _request_observatory(item):
     if _is_observatory(item):
         pass
     else:
-        raise ExoClockInputError('A plc.Observatory object is required.')
+        raise ExoClockInputError('A exoclock.Observatory object is required.')

@@ -198,7 +198,7 @@ class ExoClockData:
                     earth_rotation_data_x.append(float(ff[7:12]) + 2400000.5)
                     earth_rotation_data_y.append(float(ff[58:68].replace(' ', '')))
 
-            self.earth_rotation_data = interp1d(earth_rotation_data_x, earth_rotation_data_y, kind='cubic')
+            self.earth_rotation_data = interp1d(earth_rotation_data_x, earth_rotation_data_y)
 
         return float(self.earth_rotation_data(jd_utc))
 
