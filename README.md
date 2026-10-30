@@ -1,4 +1,3 @@
-[![Build Python 3.8](https://github.com/atsiaras/exoclock/actions/workflows/build-python-3.8.yml/badge.svg)](https://github.com/atsiaras/exoclock/actions/workflows/build-python-3.8.yml)
 [![Build Python 3.9](https://github.com/atsiaras/exoclock/actions/workflows/build-python-3.9.yml/badge.svg)](https://github.com/atsiaras/exoclock/actions/workflows/build-python-3.9.yml)
 [![Build Python 3.10](https://github.com/atsiaras/exoclock/actions/workflows/build-python-3.10.yml/badge.svg)](https://github.com/atsiaras/exoclock/actions/workflows/build-python-3.10.yml)
 [![Build Python 3.11](https://github.com/atsiaras/exoclock/actions/workflows/build-python-3.11.yml/badge.svg)](https://github.com/atsiaras/exoclock/actions/workflows/build-python-3.11.yml)

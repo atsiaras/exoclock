@@ -30,7 +30,7 @@ setup(
                  'Topic :: Scientific/Engineering :: Astronomy',
                  'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
                  'Operating System :: MacOS :: MacOS X',
-                 'Programming Language :: Python :: 3.8',
+                 'Programming Language :: Python :: 3.12',
                  ],
     entry_points={},
     packages=[package],
