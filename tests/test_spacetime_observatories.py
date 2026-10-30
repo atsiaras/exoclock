@@ -60,6 +60,7 @@ def test_observing():
     assert round(observatory.airmass(target,  moment), 1) == 1.3
     assert observatory.is_target_visible(target,  moment)
     assert len(observatory.target_horizon_crossings(target, moment, 1)) == 2
+    assert len(observatory.target_meridian_crossings(target, moment, 1)) == 1
     assert len(observatory.target_altitude_crossings(target, moment, 1, exoclock.Degrees(20))) == 2
 
     moment = exoclock.Moment('2022-05-01T12:00:00')

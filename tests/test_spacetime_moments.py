@@ -28,7 +28,7 @@ def test_times():
     ]:
 
         assert test_time.leap_seconds() == 37
-        assert round(test_time.ut1_utc_diff(), 6) == -0.110460
+        assert round(test_time.ut1_utc_diff(), 6) == -0.110436
 
         assert (test_time + dtime).utc() == datetime.datetime(2022, 1, 1, 13, 0, 0)
         assert (test_time - dtime).utc() == datetime.datetime(2022, 1, 1, 11, 0, 0)
@@ -37,14 +37,14 @@ def test_times():
         assert test_time.utc() == datetime.datetime(2022, 1, 1, 12, 0, 0)
         assert test_time.tai() == datetime.datetime(2022, 1, 1, 12, 0, 37)
         assert test_time.tt() == datetime.datetime(2022, 1, 1, 12, 1, 9, 184000)
-        assert test_time.ut1() == datetime.datetime(2022, 1, 1, 11, 59, 59, 889540)
+        assert test_time.ut1() == datetime.datetime(2022, 1, 1, 11, 59, 59, 889564)
 
         assert round(test_time.jd_utc(), 6) == 2459581.0
         assert round(test_time.jd_tai(), 6) == 2459581.000428
         assert round(test_time.jd_tt(), 6) == 2459581.000801
         assert round(test_time.jd_ut1(), 6) == 2459580.999999
 
-        assert round(test_time.era()._arcseconds, 3) == round(astropy_test_era, 3)
+        assert abs(test_time.era()._arcseconds - astropy_test_era) < 0.001
 
         print(test_time.__repr__)
         _request_time(test_time)

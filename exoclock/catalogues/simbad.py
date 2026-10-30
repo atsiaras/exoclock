@@ -21,7 +21,7 @@ Simbad.SIMBAD_URL = None
 Simbad.TIMEOUT = 5
 
 # check simbad url
-def check_simbad_server():
+def check_simbad_server(force_fail=False):
 
     if not Simbad.SIMBAD_URL:
 
@@ -33,6 +33,8 @@ def check_simbad_server():
             'https://simbad.cfa.harvard.edu/simbad'
         ]:
             try:
+                if force_fail:
+                    print(error)
                 _ = urllib.request.urlopen(url, timeout=5)
                 Simbad.SIMBAD_URL = url + '/sim-script'
                 print('connected to: ', url)
@@ -51,13 +53,11 @@ def check_simbad_server():
     else:
         return True
 
+check_simbad_server()
 
 def get_simbad_status():
 
-    if not Simbad.SIMBAD_URL:
-        message = 'Not connected'
-
-    elif Simbad.SIMBAD_URL == 'unavailable':
+    if Simbad.SIMBAD_URL == 'unavailable':
         message = 'Disconnected'
 
     else:
@@ -68,11 +68,11 @@ def get_simbad_status():
     return message
 
 
-def reconnect_to_simbad():
+def reconnect_to_simbad(force_fail=False):
 
     Simbad.SIMBAD_URL = None
 
-    _ = check_simbad_server()
+    _ = check_simbad_server(force_fail=force_fail)
 
 
 def _flat_name(name):
@@ -164,7 +164,6 @@ def simbad_search_by_name(star_name, reconnect=False):
         except requests.ConnectionError:
             print('Simbad disconnected.')
             Simbad.SIMBAD_URL = 'unavailable'
-            return None
 
         if result and len(result) > 0:
 
@@ -184,7 +183,7 @@ def simbad_search_by_name(star_name, reconnect=False):
         return None
 
 
-def simbad_search_by_coordinates(ra, dec, radius=Degrees(0.02), max_trials=10, reconnect=False):
+def simbad_search_by_coordinates(ra, dec, radius=Degrees(0.02), reconnect=False):
 
     if reconnect:
         reconnect_to_simbad()
@@ -206,7 +205,6 @@ def simbad_search_by_coordinates(ra, dec, radius=Degrees(0.02), max_trials=10, r
         except requests.ConnectionError:
             print('Simbad disconnected.')
             Simbad.SIMBAD_URL = 'unavailable'
-            return None
 
         if result and len(result) > 0:
             return FixedTarget(

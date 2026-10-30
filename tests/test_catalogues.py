@@ -38,7 +38,21 @@ def test_ecc():
 
 def test_simbad():
 
+    assert 'Connected' in exoclock.get_simbad_status()
+
+    exoclock.reconnect_to_simbad(force_fail=True)
+
+    assert 'Disconnected' in exoclock.get_simbad_status()
+
     target = exoclock.simbad_search_by_name('TYC 1949-1705-1')
+
+    assert target is None
+
+    target = exoclock.simbad_search_by_coordinates(exoclock.Degrees(0), exoclock.Degrees(0))
+
+    assert target is None
+
+    target = exoclock.simbad_search_by_name('TYC 1949-1705-1', reconnect=True)
 
     assert target.name == 'TYC 1949-1705-1'
 
@@ -46,7 +60,7 @@ def test_simbad():
 
     assert target.name == 'BD+28 2507'
 
-    target = exoclock.simbad_search_by_coordinates(target.ra, target.dec)
+    target = exoclock.simbad_search_by_coordinates(target.ra, target.dec, reconnect=True)
 
     assert target.name == 'BD+28 2507b'
 

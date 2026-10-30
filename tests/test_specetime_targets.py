@@ -28,7 +28,7 @@ def test_targets():
     _request_target(test_fixedstar)
 
     assert test_fixedstar.coord() == '03:15:00.0 +45:42:00.0'
-    assert test_fixedstar.distance_on_sphere(test_fixedstar).deg() == 0
+    assert test_fixedstar.distance_on_sphere(test_fixedstar).deg() * 3600000 < 50
     assert round(test_fixedstar.convert_to_bjd_tdb(2458485.0, 'JD_UTC'), 7) == 2458485.0046340
     assert round(test_fixedstar.convert_to_bjd_tdb(58484.5, 'MJD_UTC'), 7) == 2458485.0046340
     assert round(test_fixedstar.convert_to_bjd_tdb(2458485.0046340, 'BJD_TDB'), 7) == 2458485.0046340

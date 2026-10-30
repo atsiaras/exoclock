@@ -145,16 +145,15 @@ class Observatory:
         return altitude.deg_coord() > horizon_altitude.deg_coord()
 
 
-    def target_meridian_crossings(self, target, time_obj_1, time_obj_2, resolution=0.005):
+    def target_meridian_crossings(self, target, time_obj_1, window, resolution=0.005):
 
         _request_time(time_obj_1)
-        _request_time(time_obj_2)
         _request_target(target)
 
         crossings = []
 
         jd1 = time_obj_1.jd_utc()
-        jd2 = time_obj_2.jd_utc()
+        jd2 = jd1 + window
 
         test_ha = Degrees(self.lera(time_obj_1).deg() - target.ra.deg())
 
@@ -175,7 +174,7 @@ class Observatory:
 
         return crossings
 
-    def target_horizon_crossings(self, target, time_obj_1, window):
+    def target_horizon_crossings(self, target, time_obj_1, window, resolution=0.005):
 
         _request_time(time_obj_1)
         _request_target(target)
@@ -194,7 +193,7 @@ class Observatory:
         test_alt = _target_over_horizon(target, Moment(jd_utc=jd1))
         test_jd = jd1
 
-        for jd in np.arange(jd1 + 0.007, jd2 + 0.0001, 0.007):
+        for jd in np.arange(jd1 + resolution, jd2 + resolution/10, resolution):
 
             new_test_alt = _target_over_horizon(target, Moment(jd_utc=jd))
             new_test_jd = jd
@@ -203,11 +202,11 @@ class Observatory:
 
                 if test_alt > 0:
                     crossings.append(
-                        [Moment(jd_utc=test_jd + (0.007 * abs(test_alt / new_test_alt)) / (1 + abs(test_alt / new_test_alt))), 'set']
+                        [Moment(jd_utc=test_jd + (resolution * abs(test_alt / new_test_alt)) / (1 + abs(test_alt / new_test_alt))), 'set']
                     )
                 else:
                     crossings.append(
-                        [Moment(jd_utc=test_jd + (0.007 * abs(test_alt / new_test_alt)) / (1 + abs(test_alt / new_test_alt))), 'rise']
+                        [Moment(jd_utc=test_jd + (resolution * abs(test_alt / new_test_alt)) / (1 + abs(test_alt / new_test_alt))), 'rise']
                     )
 
             else:
